@@ -40,9 +40,6 @@ jobs:
           sed -i 's/compileSdk = .*/compileSdk = 35/g' android/app/build.gradle || true
           sed -i 's/targetSdk = .*/targetSdk = 35/g' android/app/build.gradle || true
 
-          # Inject Maven central for ffmpeg-kit
-          sed -i '/allprojects {/a \        mavenCentral()' android/build.gradle || true
-
       - name: Get Dependencies
         run: flutter pub get
 
