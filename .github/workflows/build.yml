@@ -40,8 +40,22 @@ jobs:
           sed -i 's/compileSdk = .*/compileSdk = 35/g' android/app/build.gradle || true
           sed -i 's/targetSdk = .*/targetSdk = 35/g' android/app/build.gradle || true
 
-          # Inject mavenCentral to settings.gradle repositories mode
-          sed -i '/repositories {/a \        mavenCentral()' android/settings.gradle || true
+          # Force all projects to use Maven Central and Google
+          cat << 'EOF' >> android/build.gradle
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+                  maven { url 'https://jitpack.io' }
+              }
+          }
+          EOF
+
+          # Remove strict repositoryMode if present
+          if [ -f android/settings.gradle ]; then
+            sed -i '/FAIL_ON_PROJECT_REPOS/d' android/settings.gradle || true
+            sed -i '/repositoriesMode.set/d' android/settings.gradle || true
+          fi
 
       - name: Get Dependencies
         run: flutter pub get
