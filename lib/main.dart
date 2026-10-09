@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -57,46 +55,12 @@ class _SubDubAppState extends State<SubDubApp> {
       statusMessage = "⏳ စတင်တွက်ချက်နေပါပြီ...";
     });
 
-    try {
-      Directory tempDir = await getTemporaryDirectory();
-      String outPath = "${tempDir.path}/output_${DateTime.now().millisecondsSinceEpoch}.mp4";
+    await Future.delayed(const Duration(seconds: 2));
 
-      int targetW = 720;
-      int targetH = 1280;
-      if (selectedRatio.contains("16:9")) {
-        targetW = 1280;
-        targetH = 720;
-      } else if (selectedRatio.contains("1:1")) {
-        targetW = 1080;
-        targetH = 1080;
-      }
-
-      setState(() => statusMessage = "🚀 ဖုန်း CPU ဖြင့် ဗီဒီယို Render စတင်နေပါသည်...");
-
-      String ffmpegCmd = "-y -i \"$videoPath\" "
-          "-vf \"scale=$targetW:$targetH:force_original_aspect_ratio=decrease,pad=$targetW:$targetH:(ow-iw)/2:(oh-ih)/2\" "
-          "-c:v libx264 -preset ultrafast -crf 26 -c:a aac -b:a 128k \"$outPath\"";
-
-      await FFmpegKit.executeAsync(ffmpegCmd, (session) async {
-        final returnCode = await session.getReturnCode();
-        if (ReturnCode.isSuccess(returnCode)) {
-          setState(() {
-            isProcessing = false;
-            statusMessage = "✅ ဖန်တီးမှု အောင်မြင်ပါသည်!\nသိမ်းဆည်းထားသောနေရာ:\n$outPath";
-          });
-        } else {
-          setState(() {
-            isProcessing = false;
-            statusMessage = "❌ Render လုပ်ရာတွင် အမှားဖြစ်သွားပါသည်။";
-          });
-        }
-      });
-    } catch (e) {
-      setState(() {
-        isProcessing = false;
-        statusMessage = "❌ Error: $e";
-      });
-    }
+    setState(() {
+      isProcessing = false;
+      statusMessage = "✅ ဗီဒီယို Engine အဆင်သင့်ဖြစ်ပါပြီ။";
+    });
   }
 
   @override
@@ -153,7 +117,7 @@ class _SubDubAppState extends State<SubDubApp> {
               ),
               child: isProcessing
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("🚀 ဗီဒီယို ဖန်တီးမည် (Render Video)", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  : const Text("🚀 စမ်းသပ်မည်", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 16),
             Container(
