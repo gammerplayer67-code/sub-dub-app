@@ -22,73 +22,12 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.22.2'
           channel: 'stable'
 
-      - name: Create and Fix Android Scaffold
+      - name: Create Scaffold
         run: |
-          mkdir -p temp_scaffold
-          cd temp_scaffold
-          flutter create --org com.teamseven.subdub --platforms android sub_dub_app
-          cp -r sub_dub_app/android ../
-          cd ..
-          rm -rf temp_scaffold
-
-          # Set compileSdk and targetSdk to 35
-          sed -i 's/compileSdkVersion .*/compileSdkVersion 35/g' android/app/build.gradle || true
-          sed -i 's/targetSdkVersion .*/targetSdkVersion 35/g' android/app/build.gradle || true
-          sed -i 's/compileSdk = .*/compileSdk = 35/g' android/app/build.gradle || true
-          sed -i 's/targetSdk = .*/targetSdk = 35/g' android/app/build.gradle || true
-
-          # Override settings.gradle to allow and inject MavenCentral globally
-          cat << 'EOF' > android/settings.gradle
-          pluginManagement {
-              def flutterSdkPath = {
-                  def properties = new Properties()
-                  file("local.properties").withInputStream { properties.load(it) }
-                  def flutterSdkPath = properties.getProperty("flutter.sdk")
-                  assert flutterSdkPath != null : "flutter.sdk not set in local.properties"
-                  return flutterSdkPath
-              }()
-
-              includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
-
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
-
-          plugins {
-              id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-              id "com.android.application" version "8.3.2" apply false
-              id "org.jetbrains.kotlin.android" version "1.9.0" apply false
-          }
-
-          include ":app"
-          EOF
-
-          # Inject root build.gradle allprojects
-          cat << 'EOF' > android/build.gradle
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-                  maven { url "https://jitpack.io" }
-              }
-          }
-
-          rootProject.buildDir = "../build"
-          subprojects {
-              project.buildDir = "${rootProject.buildDir}/${project.name}"
-              project.evaluationDependsOn(":app")
-          }
-
-          tasks.register("clean", Delete) {
-              delete rootProject.buildDir
-          }
-          EOF
+          flutter create --org com.teamseven.subdub --platforms android .
 
       - name: Get Dependencies
         run: flutter pub get
