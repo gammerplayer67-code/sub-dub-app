@@ -25,7 +25,7 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
-      - name: Create Android Scaffold
+      - name: Create and Configure Android Scaffold
         run: |
           mkdir -p temp_scaffold
           cd temp_scaffold
@@ -33,6 +33,15 @@ jobs:
           cp -r sub_dub_app/android ../
           cd ..
           rm -rf temp_scaffold
+
+          # Set compileSdk and targetSdk to 35
+          sed -i 's/compileSdkVersion .*/compileSdkVersion 35/g' android/app/build.gradle || true
+          sed -i 's/targetSdkVersion .*/targetSdkVersion 35/g' android/app/build.gradle || true
+          sed -i 's/compileSdk = .*/compileSdk = 35/g' android/app/build.gradle || true
+          sed -i 's/targetSdk = .*/targetSdk = 35/g' android/app/build.gradle || true
+
+          # Inject Maven central for ffmpeg-kit
+          sed -i '/allprojects {/a \        mavenCentral()' android/build.gradle || true
 
       - name: Get Dependencies
         run: flutter pub get
