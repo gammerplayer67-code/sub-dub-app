@@ -29,27 +29,46 @@ jobs:
         run: |
           mkdir -p temp_scaffold
           cd temp_scaffold
-          flutter create --org com.teamseven.subdub --platforms android sub_dub_app
+
+          flutter create \
+            --org com.teamseven.subdub \
+            --platforms android \
+            sub_dub_app
+
           cp -r sub_dub_app/android ../
+
           cd ..
           rm -rf temp_scaffold
 
+          # Configure Android SDK versions
           sed -i 's/compileSdkVersion .*/compileSdkVersion 35/g' android/app/build.gradle || true
           sed -i 's/targetSdkVersion .*/targetSdkVersion 35/g' android/app/build.gradle || true
           sed -i 's/compileSdk = .*/compileSdk = 35/g' android/app/build.gradle || true
           sed -i 's/targetSdk = .*/targetSdk = 35/g' android/app/build.gradle || true
 
+          # Configure Maven repositories
           cat << 'EOF' >> android/build.gradle
+
           allprojects {
               repositories {
                   google()
                   mavenCentral()
                   maven { url 'https://jitpack.io' }
-                  maven { url 'https://artifactory.appodeal.com/appodeal-public' }
+              }
+          }
+
+          // Redirect the retired FFmpeg Kit dependency
+          // to the maintained Android replacement.
+          allprojects {
+              configurations.configureEach {
+                  resolutionStrategy.dependencySubstitution {
+                      substitute module('com.arthenica:ffmpeg-kit-min-gpl') using module('dev.ffmpegkit-maintained:ffmpeg-kit-min-gpl:6.0.3')
+                  }
               }
           }
           EOF
 
+          # Allow project repositories
           if [ -f android/settings.gradle ]; then
             sed -i '/FAIL_ON_PROJECT_REPOS/d' android/settings.gradle || true
             sed -i '/repositoriesMode.set/d' android/settings.gradle || true
