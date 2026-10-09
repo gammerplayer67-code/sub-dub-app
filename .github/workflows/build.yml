@@ -34,24 +34,22 @@ jobs:
           cd ..
           rm -rf temp_scaffold
 
-          # Set compileSdk and targetSdk to 35
           sed -i 's/compileSdkVersion .*/compileSdkVersion 35/g' android/app/build.gradle || true
           sed -i 's/targetSdkVersion .*/targetSdkVersion 35/g' android/app/build.gradle || true
           sed -i 's/compileSdk = .*/compileSdk = 35/g' android/app/build.gradle || true
           sed -i 's/targetSdk = .*/targetSdk = 35/g' android/app/build.gradle || true
 
-          # Force all projects to use Maven Central and Google
           cat << 'EOF' >> android/build.gradle
           allprojects {
               repositories {
                   google()
                   mavenCentral()
                   maven { url 'https://jitpack.io' }
+                  maven { url 'https://artifactory.appodeal.com/appodeal-public' }
               }
           }
           EOF
 
-          # Remove strict repositoryMode if present
           if [ -f android/settings.gradle ]; then
             sed -i '/FAIL_ON_PROJECT_REPOS/d' android/settings.gradle || true
             sed -i '/repositoriesMode.set/d' android/settings.gradle || true
