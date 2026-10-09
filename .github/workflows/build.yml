@@ -25,6 +25,15 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
+      - name: Create Android Scaffold
+        run: |
+          mkdir -p temp_scaffold
+          cd temp_scaffold
+          flutter create --org com.teamseven.subdub --platforms android sub_dub_app
+          cp -r sub_dub_app/android ../
+          cd ..
+          rm -rf temp_scaffold
+
       - name: Get Dependencies
         run: flutter pub get
 
