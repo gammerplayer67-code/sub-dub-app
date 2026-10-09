@@ -27,7 +27,7 @@ jobs:
 
       - name: Create Scaffold
         run: |
-          flutter create --org com.teamseven.subdub --platforms android .
+          flutter create --org com.teamseven.subdub --project-name sub_dub_app --platforms android .
 
       - name: Get Dependencies
         run: flutter pub get
