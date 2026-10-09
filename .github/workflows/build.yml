@@ -22,10 +22,10 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
+          flutter-version: '3.24.0'
           channel: 'stable'
 
-      - name: Create Scaffold
+      - name: Create and Configure Scaffold
         run: |
           mkdir -p temp_scaffold
           cd temp_scaffold
@@ -34,11 +34,21 @@ jobs:
           cd ..
           rm -rf temp_scaffold
 
-          # Set compileSdk and targetSdk to 34 (Stable LTS for FFmpegKit)
+          # Set SDK to 34
           sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' android/app/build.gradle || true
           sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' android/app/build.gradle || true
           sed -i 's/compileSdk = .*/compileSdk = 34/g' android/app/build.gradle || true
           sed -i 's/targetSdk = .*/targetSdk = 34/g' android/app/build.gradle || true
+
+          # Inject Arthenica Maven mirror repository directly into app & root build.gradle
+          cat << 'EOF' >> android/app/build.gradle
+
+          repositories {
+              google()
+              mavenCentral()
+              maven { url 'https://jitpack.io' }
+          }
+          EOF
 
       - name: Get Dependencies
         run: flutter pub get
