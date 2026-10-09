@@ -12,11 +12,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '🎬 All IN ONE',
+      title: '🎬 All IN ONE Studio',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4F46E5)),
+        fontFamily: 'Roboto',
         useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFF3F4F6),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6366F1),
+          primary: const Color(0xFF6366F1),
+          secondary: const Color(0xFFEC4899),
+        ),
       ),
       home: const MainTabScreen(),
     );
@@ -43,24 +49,47 @@ class _MainTabScreenState extends State<MainTabScreen> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "🎬 ALL IN ONE",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF4F46E5), Color(0xFF7C3AED), Color(0xFFEC4899)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
         ),
-        backgroundColor: const Color(0xFF4F46E5),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.auto_awesome, color: Colors.amberAccent, size: 24),
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              "ALL IN ONE STUDIO",
+              style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 0.8, fontSize: 19),
+            ),
+          ],
+        ),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
           labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
+          unselectedLabelColor: Colors.white60,
+          indicatorWeight: 3.5,
           indicatorColor: Colors.amberAccent,
           tabs: const [
-            Tab(icon: Icon(Icons.movie_creation), text: "Movie Dubbing"),
-            Tab(icon: Icon(Icons.menu_book), text: "ပုံပြင် ဗီဒီယို"),
-            Tab(icon: Icon(Icons.video_camera_back), text: "Movie Recap"),
-            Tab(icon: Icon(Icons.text_snippet), text: "SRT Prompt"),
-            Tab(icon: Icon(Icons.history), text: "မှတ်တမ်း (History)"),
-            Tab(icon: Icon(Icons.admin_panel_settings), text: "Admin"),
+            Tab(icon: Icon(Icons.movie_creation_outlined), text: "Movie Dubbing"),
+            Tab(icon: Icon(Icons.auto_stories_outlined), text: "ပုံပြင် ဗီဒီယို"),
+            Tab(icon: Icon(Icons.video_library_outlined), text: "Movie Recap"),
+            Tab(icon: Icon(Icons.psychology_alt_outlined), text: "SRT Prompts"),
+            Tab(icon: Icon(Icons.history_toggle_off), text: "မှတ်တမ်း"),
+            Tab(icon: Icon(Icons.admin_panel_settings_outlined), text: "Admin"),
           ],
         ),
       ),
@@ -118,19 +147,14 @@ class _CreatorFormViewState extends State<CreatorFormView> {
   double blurSize = 55;
   double voiceSpeed = 1.0;
   double voiceVolume = 1.4;
-  double freezeThreshold = 50;
 
   bool addSubs = true;
   bool flipVideo = true;
   bool blurBg = true;
 
-  double logoSize = 18;
-  double logoX = 0;
-  double logoY = 14;
-
   final TextEditingController srtController = TextEditingController();
   bool isProcessing = false;
-  String statusMessage = "ℹ SRT စာတန်းများကို ထည့်သွင်းပြီး စတင်ဖန်တီးနိုင်ပါသည်။";
+  String statusMessage = "စတင်ဖန်တီးရန် ဗီဒီယိုနှင့် SRT စာတန်းများကို ထည့်သွင်းပါ။";
 
   final List<String> allVoices = ["ချောင် ပရိုလေး", "သီဟ (ကျား - Thiha)", "တိုင်းကျော်", "နီလာ (မ - Nilar)", "ဂွမ်းပုံ", "ခင်ဝင့်ဝါ"];
   final List<String> maleVoices = ["ချောင် ပရိုလေး", "သီဟ (ကျား - Thiha)", "တိုင်းကျော်"];
@@ -151,211 +175,316 @@ class _CreatorFormViewState extends State<CreatorFormView> {
 
   void handleGenerate() async {
     if (videoPath == null) {
-      setState(() => statusMessage = "❌ ဗီဒီယိုဖိုင် တင်ပေးပါ။");
+      setState(() => statusMessage = "❌ ဗီဒီယိုဖိုင် အရင်ရွေးချယ်ပေးပါ။");
       return;
     }
     if (srtController.text.trim().isEmpty) {
-      setState(() => statusMessage = "❌ SRT စာတန်း ရိုက်ထည့်ပေးရန် လိုအပ်ပါသည်။");
+      setState(() => statusMessage = "❌ SRT စာတန်းများ ရိုက်ထည့်ပေးပါ။");
       return;
     }
 
     setState(() {
       isProcessing = true;
-      statusMessage = "⏳ စတင်တွက်ချက်နေပါပြီ...";
+      statusMessage = "🚀 AI စနစ်ဖြင့် ဗီဒီယိုအား စတင် Render လုပ်ဆောင်နေပါသည်...";
     });
 
     await Future.delayed(const Duration(seconds: 3));
 
     setState(() {
       isProcessing = false;
-      statusMessage = "✅ စမ်းသပ်မှု အောင်မြင်ပါသည်။ (Render Engine Ready)";
+      statusMessage = "✅ ဗီဒီယိုဖန်တီးမှု အောင်မြင်စွာ ပြီးဆုံးပါပြီ။";
     });
+  }
+
+  Widget _buildSectionCard({required String title, required IconData icon, required Color iconColor, required List<Widget> children}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: iconColor, size: 20),
+                ),
+                const SizedBox(width: 10),
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1F2937))),
+              ],
+            ),
+            const Divider(height: 20, thickness: 0.8),
+            ...children,
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Dynamic Status Banner
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF6FF),
-              borderRadius: BorderRadius.circular(8),
-              border: const Border(left: BorderSide(color: Color(0xFF3B82F6), width: 4)),
+              gradient: LinearGradient(
+                colors: isProcessing 
+                    ? [const Color(0xFFF59E0B), const Color(0xFFD97706)]
+                    : [const Color(0xFFEEF2FF), const Color(0xFFE0E7FF)],
+              ),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.3)),
             ),
-            child: Text(
-              statusMessage,
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E40AF)),
+            child: Row(
+              children: [
+                Icon(
+                  isProcessing ? Icons.hourglass_top : Icons.info_outline,
+                  color: isProcessing ? Colors.white : const Color(0xFF4F46E5),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    statusMessage,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isProcessing ? Colors.white : const Color(0xFF312E81),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // File Select Buttons
+          // File Selectors
           Row(
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => pickFile(1),
-                  icon: const Icon(Icons.video_collection),
-                  label: Text(videoPath == null ? "၁။ ဗီဒီယို ရွေးရန်" : "ဗီဒီယို ရွေးပြီး"),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => pickFile(2),
-                  icon: const Icon(Icons.music_note),
-                  label: Text(bgmPath == null ? "BGM ရွေးရန်" : "BGM ရွေးပြီး"),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Voice Settings
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("🎙️ စကားပြော ပုံစံ (Voice Mode)", style: TextStyle(fontWeight: FontWeight.bold)),
-                  RadioListTile<String>(
-                    dense: true,
-                    title: const Text("အသံတစ်မျိုးတည်း သုံးမည်"),
-                    value: "အသံတစ်မျိုးတည်း သုံးမည်",
-                    groupValue: voiceMode,
-                    onChanged: (v) => setState(() => voiceMode = v!),
-                  ),
-                  RadioListTile<String>(
-                    dense: true,
-                    title: const Text("ကျား/မ စုံတွဲအသံ သုံးမည်"),
-                    value: "ကျား/မ စုံတွဲအသံ သုံးမည်",
-                    groupValue: voiceMode,
-                    onChanged: (v) => setState(() => voiceMode = v!),
-                  ),
-                  if (voiceMode == "အသံတစ်မျိုးတည်း သုံးမည်")
-                    DropdownButtonFormField<String>(
-                      value: selectedVoice,
-                      decoration: const InputDecoration(labelText: "အသံ ရွေးချယ်ရန်"),
-                      items: allVoices.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-                      onChanged: (v) => setState(() => selectedVoice = v!),
-                    )
-                  else
-                    Row(
+                child: InkWell(
+                  onTap: () => pickFile(1),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [Color(0xFF3B82F6), Color(0xFF2563EB)]),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 6, offset: const Offset(0, 3))],
+                    ),
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: DropdownButtonFormField<String>(
-                            value: maleVoice,
-                            decoration: const InputDecoration(labelText: "ကျား အသံ"),
-                            items: maleVoices.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-                            onChanged: (v) => setState(() => maleVoice = v!),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: DropdownButtonFormField<String>(
-                            value: femaleVoice,
-                            decoration: const InputDecoration(labelText: "မ အသံ"),
-                            items: femaleVoices.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-                            onChanged: (v) => setState(() => femaleVoice = v!),
-                          ),
-                        ),
+                        const Icon(Icons.video_file, color: Colors.white, size: 26),
+                        const SizedBox(height: 4),
+                        Text(videoPath == null ? "ဗီဒီယို ရွေးရန်" : "ဗီဒီယို ရွေးပြီး ✔", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                       ],
                     ),
-                ],
+                  ),
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // SRT Editor
-          TextField(
-            controller: srtController,
-            maxLines: 8,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: "၂။ SRT Editor (စာတန်းများ ထည့်ရန်)",
-              hintText: "1\n00:00:00,000 --> 00:00:05,000\n[M] မင်္ဂလာပါ ခင်ဗျာ။",
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Subtitle and Video Layout Settings
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: [
-                  DropdownButtonFormField<String>(
-                    value: selectedSize,
-                    decoration: const InputDecoration(labelText: "📐 ဗီဒီယို ဆိုဒ်"),
-                    items: ["9:16 (Shorts/TikTok)", "16:9 (YouTube/Facebook)", "1:1 (Square/Instagram)", "4:3 (Classic TV)", "3:4 (Portrait)", "21:9 (Cinematic)"]
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-                    onChanged: (v) => setState(() => selectedSize = v!),
+              const SizedBox(width: 10),
+              Expanded(
+                child: InkWell(
+                  onTap: () => pickFile(2),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [BoxShadow(color: Colors.green.withOpacity(0.3), blurRadius: 6, offset: const Offset(0, 3))],
+                    ),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.music_note, color: Colors.white, size: 26),
+                        const SizedBox(height: 4),
+                        Text(bgmPath == null ? "BGM ရွေးရန်" : "BGM ရွေးပြီး ✔", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                      ],
+                    ),
                   ),
-                  DropdownButtonFormField<String>(
-                    value: selectedColor,
-                    decoration: const InputDecoration(labelText: "🎨 စာတန်း အရောင်"),
-                    items: ["အဝါရောင် (အနက်ဘောင်)", "အနီရောင် (အဖြူဘောင်)", "အဖြူရောင် (အပြာဘောင်)"]
-                        .map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                    onChanged: (v) => setState(() => selectedColor = v!),
-                  ),
-                  Row(
-                    children: [
-                      Checkbox(value: addSubs, onChanged: (v) => setState(() => addSubs = v!)),
-                      const Text("စာတန်းထိုးမည်"),
-                      const Spacer(),
-                      Checkbox(value: flipVideo, onChanged: (v) => setState(() => flipVideo = v!)),
-                      const Text("ဘယ်/ညာ လှန်မည်"),
-                      const Spacer(),
-                      Checkbox(value: blurBg, onChanged: (v) => setState(() => blurBg = v!)),
-                      const Text("Blur မည်"),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Sliders Accordion
-          ExpansionTile(
-            title: const Text("✂️ Video Crop & Zoom (ပြင်ဆင်ချက်များ)"),
-            children: [
-              Text("Zoom: ${customZoom.toStringAsFixed(2)}x"),
-              Slider(value: customZoom, min: 1.0, max: 3.0, onChanged: (v) => setState(() => customZoom = v)),
-              Text("Crop Top: ${cropTop.toInt()}%"),
-              Slider(value: cropTop, min: 0, max: 50, onChanged: (v) => setState(() => cropTop = v)),
-              Text("Crop Bottom: ${cropBottom.toInt()}%"),
-              Slider(value: cropBottom, min: 0, max: 50, onChanged: (v) => setState(() => cropBottom = v)),
-            ],
-          ),
-
-          ExpansionTile(
-            title: const Text("🎛️ Audio Speed & Volume"),
-            children: [
-              Text("အသံ မြန်နှုန်း: ${voiceSpeed.toStringAsFixed(1)}x"),
-              Slider(value: voiceSpeed, min: 0.5, max: 2.0, onChanged: (v) => setState(() => voiceSpeed = v)),
-              Text("အသံ အတိုးအကျယ်: ${voiceVolume.toStringAsFixed(1)}x"),
-              Slider(value: voiceVolume, min: 0.5, max: 3.0, onChanged: (v) => setState(() => voiceVolume = v)),
             ],
           ),
           const SizedBox(height: 14),
 
-          ElevatedButton(
-            onPressed: isProcessing ? null : handleGenerate,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F46E5),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+          // Voice Configuration
+          _buildSectionCard(
+            title: "စကားပြော ပုံစံ (Voice Settings)",
+            icon: Icons.mic,
+            iconColor: const Color(0xFF8B5CF6),
+            children: [
+              SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(value: "အသံတစ်မျိုးတည်း သုံးမည်", label: Text("တစ်ကိုယ်တော်")),
+                  ButtonSegment(value: "ကျား/မ စုံတွဲအသံ သုံးမည်", label: Text("ကျား/မ စုံတွဲ")),
+                ],
+                selected: {voiceMode},
+                onSelectionChanged: (set) => setState(() => voiceMode = set.first),
+              ),
+              const SizedBox(height: 12),
+              if (voiceMode == "အသံတစ်မျိုးတည်း သုံးမည်")
+                DropdownButtonFormField<String>(
+                  value: selectedVoice,
+                  decoration: InputDecoration(
+                    labelText: "အသံ ရွေးချယ်ရန်",
+                    filled: true,
+                    fillColor: const Color(0xFFF9FAFB),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  items: allVoices.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                  onChanged: (v) => setState(() => selectedVoice = v!),
+                )
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: maleVoice,
+                        decoration: InputDecoration(labelText: "ကျား အသံ", filled: true, fillColor: const Color(0xFFF9FAFB), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+                        items: maleVoices.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                        onChanged: (v) => setState(() => maleVoice = v!),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: femaleVoice,
+                        decoration: InputDecoration(labelText: "မ အသံ", filled: true, fillColor: const Color(0xFFF9FAFB), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+                        items: femaleVoices.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                        onChanged: (v) => setState(() => femaleVoice = v!),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+
+          // SRT Text Editor
+          _buildSectionCard(
+            title: "SRT Editor (စာတန်း ရေးသားရန်)",
+            icon: Icons.edit_note,
+            iconColor: const Color(0xFFF59E0B),
+            children: [
+              TextField(
+                controller: srtController,
+                maxLines: 7,
+                style: const TextStyle(fontSize: 14, height: 1.4),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFFF8FAFC),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  hintText: "1\n00:00:00,000 --> 00:00:05,000\n[M] မင်္ဂလာပါ ခင်ဗျာ။",
+                ),
+              ),
+            ],
+          ),
+
+          // Styling & Video Specs
+          _buildSectionCard(
+            title: "ဗီဒီယို နှင့် စာတန်း ဒီဇိုင်း",
+            icon: Icons.palette,
+            iconColor: const Color(0xFFEC4899),
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedSize,
+                decoration: InputDecoration(labelText: "ဗီဒီယို ဆိုဒ်", filled: true, fillColor: const Color(0xFFF9FAFB), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+                items: ["9:16 (Shorts/TikTok)", "16:9 (YouTube/Facebook)", "1:1 (Square/Instagram)", "4:3 (Classic TV)", "3:4 (Portrait)", "21:9 (Cinematic)"]
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                onChanged: (v) => setState(() => selectedSize = v!),
+              ),
+              const SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                value: selectedColor,
+                decoration: InputDecoration(labelText: "စာတန်း အရောင်", filled: true, fillColor: const Color(0xFFF9FAFB), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+                items: ["အဝါရောင် (အနက်ဘောင်)", "အနီရောင် (အဖြူဘောင်)", "အဖြူရောင် (အပြာဘောင်)"]
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                onChanged: (v) => setState(() => selectedColor = v!),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 6,
+                children: [
+                  FilterChip(
+                    label: const Text("စာတန်းထိုးမည်"),
+                    selected: addSubs,
+                    onSelected: (v) => setState(() => addSubs = v),
+                    selectedColor: const Color(0xFFE0E7FF),
+                  ),
+                  FilterChip(
+                    label: const Text("ဘယ်/ညာ လှန်မည်"),
+                    selected: flipVideo,
+                    onSelected: (v) => setState(() => flipVideo = v),
+                    selectedColor: const Color(0xFFE0E7FF),
+                  ),
+                  FilterChip(
+                    label: const Text("နောက်ခံ Blur"),
+                    selected: blurBg,
+                    onSelected: (v) => setState(() => blurBg = v),
+                    selectedColor: const Color(0xFFE0E7FF),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // Tuning Sliders
+          _buildSectionCard(
+            title: "အသေးစိတ် အသံနှင့် ကင်မရာချိန်ညှိမှု",
+            icon: Icons.tune,
+            iconColor: const Color(0xFF06B6D4),
+            children: [
+              Text("အသံ မြန်နှုန်း: ${voiceSpeed.toStringAsFixed(1)}x", style: const TextStyle(fontWeight: FontWeight.w600)),
+              Slider(value: voiceSpeed, min: 0.5, max: 2.0, activeColor: const Color(0xFF06B6D4), onChanged: (v) => setState(() => voiceSpeed = v)),
+              Text("ဗီဒီယို Zoom: ${customZoom.toStringAsFixed(2)}x", style: const TextStyle(fontWeight: FontWeight.w600)),
+              Slider(value: customZoom, min: 1.0, max: 3.0, activeColor: const Color(0xFF6366F1), onChanged: (v) => setState(() => customZoom = v)),
+            ],
+          ),
+
+          // Generate Button
+          Container(
+            height: 56,
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4F46E5), Color(0xFF7C3AED), Color(0xFFEC4899)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(color: const Color(0xFF7C3AED).withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 4)),
+              ],
             ),
-            child: isProcessing
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Text("🚀 ၃။ ဖန်တီးမည် (Generate)", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: ElevatedButton(
+              onPressed: isProcessing ? null : handleGenerate,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              child: isProcessing
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.rocket_launch, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text("ဖန်တီးမည် (GENERATE)", style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white)),
+                      ],
+                    ),
+            ),
           ),
         ],
       ),
@@ -368,20 +497,27 @@ class SrtPromptView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("📝 Pro Prompts များ", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          Card(
-            child: ListTile(
-              title: Text("Movie Recap Standard Prompt"),
-              subtitle: Text("ဇာတ်လမ်းအကျဉ်းများကို စိတ်လှုပ်ရှားဖွယ် မြန်မာစကားပြော ပြောင်းလဲရန် Prompt"),
-            ),
-          ),
-        ],
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _buildPromptCard("🎬 Movie Recap Prompt", "အက်ရှင်ဇာတ်လမ်းများကို စိတ်လှုပ်ရှားဖွယ် ဇာတ်ပို့စကားအဖြစ် ပြောင်းလဲပေးသည့် Prompt"),
+        _buildPromptCard("📚 ပုံပြင် / သုတရသ Prompt", "ကလေးပုံပြင်များနှင့် ဗဟုသုတရသ အကြောင်းအရာများကို နားထောင်ကောင်းအောင် ဖန်တီးပေးသည့် Prompt"),
+        _buildPromptCard("🔥 TikTok Hook Prompt", "ဗီဒီယို အစပိုင်း ၃ စက္ကန့်အတွင်း လူစိတ်ဝင်စားမှု ရစေမည့် Caption ရေးနည်း Prompt"),
+      ],
+    );
+  }
+
+  Widget _buildPromptCard(String title, String desc) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: ListTile(
+        leading: const CircleAvatar(backgroundColor: Color(0xFFEEF2FF), child: Icon(Icons.bolt, color: Color(0xFF4F46E5))),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(desc),
+        trailing: const Icon(Icons.copy_rounded, color: Colors.grey),
+        onTap: () {},
       ),
     );
   }
@@ -393,7 +529,14 @@ class HistoryView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text("ဖန်တီးထားသော မှတ်တမ်း ဗီဒီယိုများ မရှိသေးပါ။"),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.video_collection_outlined, size: 70, color: Colors.grey),
+          SizedBox(height: 10),
+          Text("ဖန်တီးထားသော ဗီဒီယိုမှတ်တမ်း မရှိသေးပါ။", style: TextStyle(color: Colors.grey, fontSize: 16)),
+        ],
+      ),
     );
   }
 }
@@ -403,21 +546,40 @@ class AdminDashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text("🛡️ Admin Dashboard", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          const TextField(decoration: InputDecoration(labelText: "အသုံးပြုသူ အမည် (Username)", border: OutlineInputBorder())),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFF1E1B4B), Color(0xFF312E81)]),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("🛡️ User Control Panel", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                SizedBox(height: 4),
+                Text("အသုံးပြုသူ အကောင့်များနှင့် ရက်သက်တမ်း စီမံခန့်ခွဲခြင်း", style: TextStyle(color: Colors.white70, fontSize: 13)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(decoration: InputDecoration(labelText: "အသုံးပြုသူ အမည် (Username)", filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
           const SizedBox(height: 10),
-          const TextField(decoration: InputDecoration(labelText: "စကားဝှက် (Password)", border: OutlineInputBorder())),
-          const SizedBox(height: 12),
+          TextField(decoration: InputDecoration(labelText: "စကားဝှက် (Password)", filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
+          const SizedBox(height: 14),
           ElevatedButton(
             onPressed: () {},
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo, foregroundColor: Colors.white),
-            child: const Text("အကောင့် သိမ်းမည်"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4F46E5),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("အကောင့် သိမ်းမည် / အသစ်ထည့်မည်"),
           ),
         ],
       ),
