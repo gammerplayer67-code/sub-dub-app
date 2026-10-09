@@ -1,11 +1,9 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_min_gpl/return_code.dart';
-import 'package:http/http.dart' as http;
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -26,7 +24,6 @@ class _SubDubAppState extends State<SubDubApp> {
   final TextEditingController srtController = TextEditingController();
   String selectedVoice = "သီဟ (ကျား - Thiha)";
   String selectedRatio = "9:16 (Shorts/TikTok)";
-  double voiceSpeed = 1.0;
   bool isProcessing = false;
   String statusMessage = "အဆင်သင့်ဖြစ်ပါပြီ။ ဗီဒီယိုနှင့် SRT ထည့်သွင်းပါ။";
 
@@ -64,7 +61,6 @@ class _SubDubAppState extends State<SubDubApp> {
       Directory tempDir = await getTemporaryDirectory();
       String outPath = "${tempDir.path}/output_${DateTime.now().millisecondsSinceEpoch}.mp4";
 
-      // Target resolution
       int targetW = 720;
       int targetH = 1280;
       if (selectedRatio.contains("16:9")) {
@@ -77,7 +73,6 @@ class _SubDubAppState extends State<SubDubApp> {
 
       setState(() => statusMessage = "🚀 ဖုန်း CPU ဖြင့် ဗီဒီယို Render စတင်နေပါသည်...");
 
-      // FFmpeg command using phone CPU
       String ffmpegCmd = "-y -i \"$videoPath\" "
           "-vf \"scale=$targetW:$targetH:force_original_aspect_ratio=decrease,pad=$targetW:$targetH:(ow-iw)/2:(oh-ih)/2\" "
           "-c:v libx264 -preset ultrafast -crf 26 -c:a aac -b:a 128k \"$outPath\"";
