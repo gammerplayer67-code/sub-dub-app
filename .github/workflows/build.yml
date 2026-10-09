@@ -22,7 +22,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.2'
+          flutter-version: '3.19.6'
           channel: 'stable'
 
       - name: Create Scaffold
@@ -33,6 +33,12 @@ jobs:
           cp -r sub_dub_app/android ../
           cd ..
           rm -rf temp_scaffold
+
+          # Set compileSdk and targetSdk to 34 (Stable LTS for FFmpegKit)
+          sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' android/app/build.gradle || true
+          sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' android/app/build.gradle || true
+          sed -i 's/compileSdk = .*/compileSdk = 34/g' android/app/build.gradle || true
+          sed -i 's/targetSdk = .*/targetSdk = 34/g' android/app/build.gradle || true
 
       - name: Get Dependencies
         run: flutter pub get
